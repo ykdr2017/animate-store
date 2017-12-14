@@ -2,7 +2,7 @@ NOTE: Source code comments and README are under development.
 
 # animate-store
 
-(CI badge)
+[![Build Status](https://travis-ci.org/ykdr2017/animate-store.svg?branch=master)](https://travis-ci.org/ykdr2017/animate-store)
 
 ## ABOUT animate-store
 
