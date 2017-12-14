@@ -1,4 +1,4 @@
-// Type definitions for animate-store 0.0.1
+// Type definitions for animate-store 0.0.2
 // Project: https://github.com/ykdr/animate-store
 // Definitions by: YKDR <https://github.com/ykdr/>
 // Definitions: ./types/index.d.ts
