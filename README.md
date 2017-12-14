@@ -1,5 +1,3 @@
-NOTE: Source code comments and README are under development.
-
 # animate-store
 
 [![Build Status](https://travis-ci.org/ykdr2017/animate-store.svg?branch=master)](https://travis-ci.org/ykdr2017/animate-store)
