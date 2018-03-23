@@ -25,17 +25,15 @@ let anim: Animate.Animation = new Animate.Animation([0], (p) => {
 	render({ x: p[0] });
 });
 
-let _x: number;
+let x: number = 0;
 function render(state?: { x: number }): void {
-	_x = _x ? _x : 0;
-	let x = state ? state.x : _x;
+	x = state ? state.x : x;
 	ReactDOM.render(
 		<div style={{ position: 'relative', left: Math.floor(x) }}>
 			This will move 200px left 0.5 seconds.
 		</div>,
 		document.querySelector('.app')
 	);
-	_x = x;
 }
 
 anim.move(
@@ -47,7 +45,7 @@ anim.move(
 ```
 
 NOTE: In actual development with React,
-`state, _x` had better be defined in established place, such as state in React.Component.
+`state, x` had better be defined in established place, such as state in React.Component.
 
 ## DEVELOP
 

@@ -56,11 +56,10 @@ export class Animation {
 	 * @param renderer Function called when the position moved.
 	 */
 	constructor(pos: number[], renderer?: ((p: number[]) => void)) {
-		let __this: Animation = this;
-		__this.pos = pos;
+		this.pos = pos;
 		if (renderer) {
-			__this.renderer = renderer;
-			__this.renderer(__this.pos);
+			this.renderer = renderer;
+			this.renderer(this.pos);
 		}
 	}
 	/**
@@ -70,20 +69,19 @@ export class Animation {
 	 * @return {Promise<{}>}
 	 */
 	public move(conf: MoveConf): Promise<{}> {
-		let __this: Animation = this;
-		let movStamp: number = __this.movStamp = new Date().getTime();
-		__this.setConf(conf);
-		if (__this.duration > 0) {
+		let movStamp: number = this.movStamp = new Date().getTime();
+		this.setConf(conf);
+		if (this.duration > 0) {
 			return new Promise<{}>((resolve, reject) => {
 				raf((t) => {
-					__this.requested(
+					this.requested(
 						t, movStamp, 
-						(() => { __this.callback(); resolve({}); }),
+						(() => { this.callback(); resolve({}); }),
 					);
 				});
 			});
 		}
-		return __this.moveImmediateCurrentConf(movStamp);
+		return this.moveImmediateCurrentConf(movStamp);
 	}
 	/**
 	 * Moves positions immediately (without animation).
@@ -92,11 +90,10 @@ export class Animation {
 	 * @return {Promise<{}>}
 	 */
 	public moveImmediate(conf: MoveConf): Promise<{}> {
-		let __this: Animation = this;
-		let movStamp: number = __this.movStamp = new Date().getTime();
-		__this.setConf(conf);
-		__this.duration = 0;
-		return __this.moveImmediateCurrentConf(movStamp);
+		let movStamp: number = this.movStamp = new Date().getTime();
+		this.setConf(conf);
+		this.duration = 0;
+		return this.moveImmediateCurrentConf(movStamp);
 	}
 	/**
 	 * Runs multiple animations sequentially.
@@ -105,19 +102,19 @@ export class Animation {
 	 * @return {Promise<{}>}
 	 */
 	public sequence(arr: MoveConf[]): Promise<{}> {
-		let __this: Animation = this;
 		let idx: number = 0;
 		let len: number = arr.length;
 		return new Promise<{}>((resolve, reject) => {
-			function runUnit(): void {
-				__this.move(arr[idx]).then(() => {
+			const runUnit = () => {
+				this.move(arr[idx]).then(() => {
 					idx++;
-					if (idx < len)
+					if (idx < len) {
 						raf((t) => { runUnit(); });
-					else
+					} else {
 						resolve({});
+					}
 				});
-			}
+			};
 			if (len > 0) runUnit(); else resolve({});
 		});
 	}
@@ -128,16 +125,15 @@ export class Animation {
 	 * @return {void}
 	 */
 	public loop(arr: MoveConf[]): void {
-		let __this: Animation = this;
 		let idx: number = 0;
 		let len: number = arr.length;
-		function runUnit(): void {
-			__this.move(arr[idx]).then(() => {
+		const runUnit = () => {
+			this.move(arr[idx]).then(() => {
 				idx++;
 				if (idx >= len) idx = 0;
 				raf((t) => { runUnit(); });
 			});
-		}
+		};
 		if (len > 0) runUnit();
 	}
 	/**
@@ -147,12 +143,11 @@ export class Animation {
 	 * @return {void}
 	 */
 	public alternate(arr: MoveConf[]): void {
-		let __this: Animation = this;
 		let idx: number = 0;
 		let len: number = arr.length;
 		let isBack: boolean = false;
-		function runUnit(): void {
-			__this.move(arr[idx]).then(() => {
+		const runUnit = () => {
+			this.move(arr[idx]).then(() => {
 				if (len >= 2) {
 					if (isBack) {
 						idx--;
@@ -170,9 +165,9 @@ export class Animation {
 				}
 				raf((t) => { runUnit(); });
 			});
-		}
+		};
 		if (len >= 2) {
-			__this.moveImmediate(arr[0]).then(() => {
+			this.moveImmediate(arr[0]).then(() => {
 				idx++;
 				runUnit();
 			});
@@ -184,8 +179,7 @@ export class Animation {
 	 * @return {Promise<{}>}
 	 */
 	public stop(): Promise<{}> {
-		let __this: Animation = this;
-		let movStamp: number = __this.movStamp = new Date().getTime();
+		let movStamp: number = this.movStamp = new Date().getTime();
 		return new Promise<{}>((resolve, reject) => {
 			raf((t) => { resolve({}); });
 		});
@@ -196,9 +190,8 @@ export class Animation {
 	 * @return {Animation}
 	 */
 	public setRenderer(renderer: (p: number[]) => void): Animation {
-		let __this: Animation = this;
-		__this.renderer = renderer;
-		return __this;
+		this.renderer = renderer;
+		return this;
 	}
 	/**
 	 * Timestamp when the motion started.
@@ -242,19 +235,18 @@ export class Animation {
 	 * @return {void}
 	 */
 	private setConf(conf: MoveConf): void {
-		let __this: Animation = this;
-		__this.next = deepcopy<MoveNext[]>(
+		this.next = deepcopy<MoveNext[]>(
 			conf.next.hasOwnProperty('length') ? 
 					(conf.next as MoveNext[]) : ([conf.next as MoveNext]),
 		);
-		__this.process = __this.pos.map<MoveProcess>((v, i) => ({
-			delta: __this.next[i].value - v,
+		this.process = this.pos.map<MoveProcess>((v, i) => ({
+			delta: this.next[i].value - v,
 			offset: v,
 		}));
-		__this.tRatio = 0;
-		__this.duration = conf.duration ? conf.duration : 0;
-		__this.callback = conf.callback ? conf.callback : (() => {});
-		__this.ct = 0;
+		this.tRatio = 0;
+		this.duration = conf.duration ? conf.duration : 0;
+		this.callback = conf.callback ? conf.callback : (() => {});
+		this.ct = 0;
 	}
 	/**
 	 * Moves positions immediately with current configuration.
@@ -263,14 +255,13 @@ export class Animation {
 	 * @return {Promise<{}>}
 	 */
 	private moveImmediateCurrentConf(stmp: number): Promise<{}> {
-		let __this: Animation = this;
 		return new Promise<{}>((resolve, reject) => {
-			if (stmp === __this.movStamp) {
-				__this.pos = __this.next.map<number>((v) => v.value);
-				__this.tRatio = 1;
-				if (__this.renderer) __this.renderer(deepcopy<number[]>(__this.pos));
+			if (stmp === this.movStamp) {
+				this.pos = this.next.map<number>((v) => v.value);
+				this.tRatio = 1;
+				if (this.renderer) this.renderer(deepcopy<number[]>(this.pos));
 				raf((t) => {
-					__this.callback(); resolve({});
+					this.callback(); resolve({});
 				});
 			}
 		});
@@ -283,25 +274,26 @@ export class Animation {
 	 * @return {void}
 	 */
 	private requested(t: number, stmp: number, cb: (() => void)): void {
-		let __this: Animation = this;
 		let dtRatio: number;
-		if (stmp === __this.movStamp) {
-			if (__this.ct === 0) __this.ct = t;
-			dtRatio = (t - __this.ct) / __this.duration;
-			__this.ct = t;
-			if (__this.tRatio <= (1 - dtRatio)) {
-				__this.tRatio += dtRatio;
-				__this.pos = __this.process.map<number>((process, i) => 
-					process.offset + __this.next[i].curve(__this.tRatio) * process.delta,
+		if (stmp === this.movStamp) {
+			if (this.ct === 0) this.ct = t;
+			dtRatio = (t - this.ct) / this.duration;
+			this.ct = t;
+			if (this.tRatio <= (1 - dtRatio)) {
+				this.tRatio += dtRatio;
+				this.pos = this.process.map<number>((process, i) => 
+					process.offset + this.next[i].curve(this.tRatio) * process.delta,
 				);
-				if (__this.renderer)
-					__this.renderer(deepcopy<number[]>(__this.pos));
-				raf((t) => { __this.requested(t, stmp, cb); });
+				if (this.renderer) {
+					this.renderer(deepcopy<number[]>(this.pos));
+				}
+				raf((t) => { this.requested(t, stmp, cb); });
 			} else {
-				__this.tRatio = 1;
-				__this.pos = __this.next.map<number>((v) => v.value);
-				if (__this.renderer)
-					__this.renderer(deepcopy<number[]>(__this.pos));
+				this.tRatio = 1;
+				this.pos = this.next.map<number>((v) => v.value);
+				if (this.renderer) {
+					this.renderer(deepcopy<number[]>(this.pos));
+				}
 				raf((t) => { cb(); });
 			}
 		}
