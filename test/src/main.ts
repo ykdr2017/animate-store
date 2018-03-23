@@ -13,7 +13,6 @@ const IS_FF: boolean =
 
 function test(): void {
 	const render = (state?: { x: number }) => {
-		console.log('render done', x);
 		x = state ? state.x : x;
 	};
 	let anim: Animate.Animation;
@@ -27,7 +26,6 @@ function test(): void {
 				anim = new Animate.Animation([100], (p) => {
 					render({ x: p[0] });
 				});
-				console.log('constructor done');
 				done();
 			});
 			it('renderer initialized.', (done) => {
@@ -49,12 +47,10 @@ function test(): void {
 						next: { value: 200, curve: Animate.Curve.linear },
 						duration: 100,
 						callback: () => {
-							console.log('callback done');
 							callbackCalled = true;
 						},
 					}).then(() => {
 						thenCalled = true;
-						console.log('thenCalled done');
 						done();
 					});
 					if (typeof(window) === 'undefined') {
